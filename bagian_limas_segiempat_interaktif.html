@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bagian-bagian Limas Segi Empat</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --color-border-tertiary:#e2e8f0;
+  --color-border-secondary:#cbd5e1;
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f8fafc;
+  --color-background-info:#eff6ff;
+  --color-text-primary:#0f172a;
+  --color-text-secondary:#475569;
+  --color-text-tertiary:#94a3b8;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.wrap{display:grid;grid-template-columns:300px 1fr;min-height:580px;border-radius:16px;overflow:hidden;border:0.5px solid var(--color-border-tertiary);width:100%;max-width:820px;box-shadow:0 4px 24px rgba(0,0,0,0.08)}
+.left{background:#0f172a;display:flex;flex-direction:column}
+.left-top{padding:1.25rem 1.25rem 0}
+.app-title{color:#e2e8f0;font-size:17px;font-weight:500;margin-bottom:4px}
+.app-sub{color:#64748b;font-size:11px;margin-bottom:1rem}
+.nav-list{display:flex;flex-direction:column;gap:4px}
+.nav-btn{display:flex;align-items:center;gap:10px;background:transparent;border:none;border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;transition:all 0.15s;width:100%}
+.nav-btn:hover{background:rgba(255,255,255,0.07)}
+.nav-btn.active{background:#1e3a5f}
+.nav-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.nav-label{font-size:12.5px;color:#94a3b8;font-weight:400}
+.nav-btn.active .nav-label{color:#93c5fd}
+.nav-count{margin-left:auto;font-size:11px;background:rgba(148,163,184,0.15);color:#64748b;padding:2px 7px;border-radius:20px}
+.nav-btn.active .nav-count{background:rgba(59,130,246,0.2);color:#60a5fa}
+.canvas-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;gap:0.75rem}
+.info-pill{background:#1e293b;border:0.5px solid #334155;border-radius:20px;padding:6px 14px;font-size:11px;color:#94a3b8;text-align:center;max-width:260px;line-height:1.5}
+.right{background:var(--color-background-primary);display:flex;flex-direction:column}
+.right-header{padding:1.25rem 1.25rem 0.75rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.right-title{font-size:16px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.right-desc{font-size:12.5px;color:var(--color-text-secondary);line-height:1.6}
+.right-body{padding:1rem 1.25rem;flex:1;overflow-y:auto}
+.items-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.item-card{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:10px;border:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:all 0.15s;user-select:none}
+.item-card:hover{background:var(--color-background-secondary)}
+.item-card.on{border-color:transparent;background:var(--color-background-info)}
+.cb{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--color-border-secondary);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.item-card.on .cb{background:#2563eb;border-color:#2563eb;color:#fff;font-size:10px}
+.item-card.on .cb::after{content:'✓'}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.item-label{font-size:12px;color:var(--color-text-primary);line-height:1.3}
+.item-card.on .item-label{color:#1d4ed8}
+.formula-box{margin-top:1rem;background:var(--color-background-secondary);border-radius:10px;padding:0.75rem 1rem}
+.formula-title{font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.formula-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.formula-row:last-child{border-bottom:none}
+.formula-key{color:var(--color-text-secondary)}
+.formula-val{color:var(--color-text-primary);font-weight:500}
+.bottom-bar{padding:0.75rem 1.25rem;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:6px}
+.action-btn{flex:1;padding:7px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);font-size:12px;cursor:pointer;transition:background 0.12s}
+.action-btn:hover{background:var(--color-background-secondary)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="left">
+    <div class="left-top">
+      <div class="app-title">Bagian-bagian Limas Segi Empat</div>
+      <div class="app-sub">Limas T.ABCD — klik menu untuk menjelajahi</div>
+      <div class="nav-list" id="navList"></div>
+    </div>
+    <div class="canvas-area">
+      <canvas id="c" width="270" height="230"></canvas>
+      <div class="info-pill" id="infoPill">Pilih menu lalu centang elemen untuk menyorotnya</div>
+    </div>
+  </div>
+  <div class="right">
+    <div class="right-header">
+      <div class="right-title" id="rTitle">Selamat datang</div>
+      <div class="right-desc" id="rDesc">Pilih salah satu bagian limas segi empat dari menu di sebelah kiri untuk mulai belajar.</div>
+    </div>
+    <div class="right-body" id="rBody"></div>
+    <div class="bottom-bar">
+      <button class="action-btn" onclick="checkAll()">Tampilkan semua</button>
+      <button class="action-btn" onclick="clearAll()">Hapus semua</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Limas segi empat T.ABCD
+// Alas: persegi ABCD (bawah)
+// A = depan-kiri, B = depan-kanan, C = belakang-kanan, D = belakang-kiri
+// Titik puncak: T (atas-tengah)
+
+const menus=[
+  {key:'titikSudut',label:'Titik Sudut',icon:'⬡',count:'5',color:'#f59e0b',
+   title:'Titik sudut limas segi empat',
+   desc:'Limas segi empat memiliki 5 titik sudut: 4 titik pada alas (A, B, C, D) dan 1 titik puncak (T).',
+   formula:[['Jumlah','5 titik'],['Titik alas','A, B, C, D'],['Titik puncak','T']],
+   items:[
+     {id:'alas',label:'Titik alas (A, B, C, D)',color:'#f59e0b'},
+     {id:'puncak',label:'Titik puncak (T)',color:'#fcd34d'}
+   ]},
+  {key:'rusuk',label:'Rusuk',icon:'━',count:'8',color:'#60a5fa',
+   title:'Rusuk limas segi empat',
+   desc:'Limas segi empat memiliki 8 rusuk: 4 rusuk alas (AB, BC, CD, DA) dan 4 rusuk tegak/lateral (TA, TB, TC, TD).',
+   formula:[['Rusuk alas (AB, BC, CD, DA)','a'],['Rusuk lateral (TA, TB, TC, TD)','s (apotema rusuk)'],['Total rusuk','8 buah']],
+   items:[
+     {id:'ra',label:'Rusuk alas × 4',color:'#60a5fa'},
+     {id:'rl',label:'Rusuk lateral × 4',color:'#f472b6'}
+   ]},
+  {key:'bidangSisi',label:'Bidang Sisi',icon:'▣',count:'5',color:'#a78bfa',
+   title:'Bidang sisi limas segi empat',
+   desc:'Limas segi empat memiliki 5 bidang sisi: 1 sisi alas berbentuk persegi (ABCD) dan 4 sisi tegak berbentuk segitiga (TAB, TBC, TCD, TDA).',
+   formula:[['Luas alas','s × s = s²'],['Luas sisi tegak','½ × a × t△'],['Total sisi','5 bidang']],
+   items:[
+     {id:'ABCD',label:'ABCD — alas',color:'#ef4444'},
+     {id:'TAB',label:'TAB — depan',color:'#eab308'},
+     {id:'TBC',label:'TBC — kanan',color:'#22c55e'},
+     {id:'TCD',label:'TCD — belakang',color:'#06b6d4'},
+     {id:'TDA',label:'TDA — kiri',color:'#a78bfa'}
+   ]},
+  {key:'diagonal',label:'Diagonal Alas',icon:'╲',count:'2',color:'#fb923c',
+   title:'Diagonal alas limas segi empat',
+   desc:'Alas persegi ABCD memiliki 2 diagonal: AC (dari depan-kiri ke belakang-kanan) dan BD (dari depan-kanan ke belakang-kiri). Keduanya berpotongan di titik tengah O.',
+   formula:[['Diagonal alas (AC & BD)','s√2'],['Titik potong diagonal','O (pusat alas)'],['Jumlah diagonal','2 buah']],
+   items:[
+     {id:'dAC',label:'Diagonal AC',color:'#fb923c'},
+     {id:'dBD',label:'Diagonal BD',color:'#c084fc'}
+   ]},
+  {key:'tinggi',label:'Tinggi & Apotema',icon:'↕',count:'2',color:'#4ade80',
+   title:'Tinggi limas & apotema',
+   desc:'Tinggi limas (t) adalah jarak vertikal dari puncak T ke bidang alas (titik O). Apotema sisi adalah jarak dari puncak T ke titik tengah rusuk alas (misalnya titik M pada AB).',
+   formula:[['Tinggi limas (TO)','t'],['Volume','⅓ × s² × t'],['Luas permukaan','s² + 4×(½×a×t△)']],
+   items:[
+     {id:'tinggi',label:'Tinggi limas (TO)',color:'#4ade80'},
+     {id:'apotema',label:'Apotema sisi (TM)',color:'#fb923c'}
+   ]}
+];
+
+let cur='rusuk', checked={};
+
+const W=270, H=230;
+const cv=document.getElementById('c');
+const cx=cv.getContext('2d');
+
+// Koordinat perspektif limas T.ABCD
+// Alas persegi ABCD dalam perspektif isometrik ringan
+const P = {
+  A: [40,  190],   // depan-kiri
+  B: [210, 190],   // depan-kanan
+  C: [230, 148],   // belakang-kanan (perspektif agak naik)
+  D: [60,  148],   // belakang-kiri
+  T: [135,  28]    // puncak
+};
+
+// O = pusat alas (perpotongan diagonal ABCD)
+const O = [
+  (P.A[0]+P.C[0])/2,
+  (P.A[1]+P.C[1])/2
+];
+
+// M = titik tengah AB (untuk apotema sisi depan)
+const M = [
+  (P.A[0]+P.B[0])/2,
+  (P.A[1]+P.B[1])/2
+];
+
+const loff={
+  A:[-16, 14],
+  B:[  6, 14],
+  C:[  6,  4],
+  D:[-16,  4],
+  T:[  4,-10]
+};
+
+function seg(a,b,col,w,dash){
+  const pa=typeof a==='string'?P[a]:a;
+  const pb=typeof b==='string'?P[b]:b;
+  cx.save();cx.beginPath();cx.strokeStyle=col;cx.lineWidth=w;cx.setLineDash(dash||[]);
+  cx.moveTo(...pa);cx.lineTo(...pb);cx.stroke();cx.restore();
+}
+
+function face(pts,col,alpha){
+  cx.save();cx.globalAlpha=alpha||0.22;cx.fillStyle=col;cx.beginPath();
+  cx.moveTo(...P[pts[0]]);pts.slice(1).forEach(p=>cx.lineTo(...P[p]));
+  cx.closePath();cx.fill();
+  cx.globalAlpha=(alpha||0.22)+0.55;cx.strokeStyle=col;cx.lineWidth=2;cx.stroke();cx.restore();
+}
+
+function dot(p,col,r){
+  const pp=typeof p==='string'?P[p]:p;
+  cx.save();cx.beginPath();cx.arc(...pp,r,0,Math.PI*2);cx.fillStyle=col;cx.fill();cx.restore();
+}
+
+function drawAll(){
+  cx.clearRect(0,0,W,H);
+  const base='#475569', dim='#334155';
+
+  // Rangka dasar alas ABCD
+  seg('A','B',base,1.5);         // depan
+  seg('B','C',base,1.5);         // kanan-depan
+  seg('C','D',dim,1,[5,4]);      // belakang (tersembunyi)
+  seg('D','A',dim,1,[5,4]);      // kiri-belakang
+
+  // Rusuk lateral dari puncak T
+  seg('T','A',base,1.5);
+  seg('T','B',base,1.5);
+  seg('T','C',dim,1,[5,4]);      // ke belakang-kanan (tersembunyi)
+  seg('T','D',dim,1,[5,4]);      // ke belakang-kiri (tersembunyi)
+
+  const m=menus.find(x=>x.key===cur);
+
+  // ── Titik sudut ──
+  if(cur==='titikSudut'){
+    ['A','B','C','D'].forEach(p=>dot(p,checked['alas']?'#f59e0b':'#475569',checked['alas']?5.5:3));
+    dot('T',checked['puncak']?'#fcd34d':'#475569',checked['puncak']?5.5:3);
+  } else {
+    Object.keys(P).forEach(p=>dot(p,'#475569',3));
+  }
+
+  // ── Rusuk ──
+  if(cur==='rusuk'){
+    if(checked['ra']){
+      seg('A','B','#60a5fa',3);
+      seg('B','C','#60a5fa',2.5,[5,4]);
+      seg('C','D','#60a5fa',2.5,[5,4]);
+      seg('D','A','#60a5fa',2.5,[5,4]);
+    }
+    if(checked['rl']){
+      seg('T','A','#f472b6',3);
+      seg('T','B','#f472b6',3);
+      seg('T','C','#f472b6',2.5,[5,4]);
+      seg('T','D','#f472b6',2.5,[5,4]);
+    }
+  }
+
+  // ── Bidang sisi ──
+  if(cur==='bidangSisi'){
+    const fs={
+      ABCD:['A','B','C','D'],
+      TAB:['T','A','B'],
+      TBC:['T','B','C'],
+      TCD:['T','C','D'],
+      TDA:['T','D','A']
+    };
+    m.items.forEach(it=>{if(checked[it.id]&&fs[it.id])face(fs[it.id],it.color);});
+  }
+
+  // ── Diagonal alas ──
+  if(cur==='diagonal'){
+    if(checked['dAC']){
+      seg('A','C','#fb923c',2.5,[6,3]);
+      dot(O,'#fb923c',4);
+    }
+    if(checked['dBD']){
+      seg('B','D','#c084fc',2.5,[6,3]);
+      dot(O,'#c084fc',4);
+    }
+    if(checked['dAC']||checked['dBD']){
+      // Titik O
+      cx.fillStyle='#e2e8f0';cx.font='bold 11px sans-serif';
+      cx.fillText('O',O[0]+5,O[1]+4);
+    }
+  }
+
+  // ── Tinggi & Apotema ──
+  if(cur==='tinggi'){
+    if(checked['tinggi']){
+      // Garis tinggi dari T ke O
+      cx.save();cx.strokeStyle='#4ade80';cx.lineWidth=2.5;cx.setLineDash([]);
+      cx.beginPath();cx.moveTo(...P.T);cx.lineTo(...O);cx.stroke();cx.restore();
+      dot(O,'#4ade80',4);
+      cx.fillStyle='#4ade80';cx.font='bold 11px sans-serif';cx.fillText('O',O[0]+5,O[1]+4);
+      // Siku kecil di O
+      cx.save();cx.strokeStyle='#4ade80';cx.lineWidth=1;cx.setLineDash([]);
+      const sz=7;
+      cx.beginPath();cx.moveTo(O[0]+sz,O[1]);cx.lineTo(O[0]+sz,O[1]-sz);cx.lineTo(O[0],O[1]-sz);cx.stroke();
+      cx.restore();
+      // Garis putus dari O ke alas (proyeksi)
+      cx.save();cx.strokeStyle='#4ade8055';cx.lineWidth=1.5;cx.setLineDash([4,3]);
+      cx.beginPath();cx.moveTo(...O);cx.stroke();cx.restore();
+    }
+    if(checked['apotema']){
+      // Apotema sisi: dari T ke titik tengah AB (M)
+      cx.save();cx.strokeStyle='#fb923c';cx.lineWidth=2.5;cx.setLineDash([]);
+      cx.beginPath();cx.moveTo(...P.T);cx.lineTo(...M);cx.stroke();cx.restore();
+      dot(M,'#fb923c',4);
+      cx.fillStyle='#fb923c';cx.font='bold 11px sans-serif';cx.fillText('M',M[0]+5,M[1]+4);
+    }
+  }
+
+  // Label titik utama
+  cx.fillStyle='#94a3b8';cx.font='bold 11px sans-serif';
+  Object.entries(P).forEach(([n,[x,y]])=>{
+    const[dx,dy]=loff[n];cx.fillText(n,x+dx,y+dy);
+  });
+
+  const activeCount=Object.values(checked).filter(Boolean).length;
+  document.getElementById('infoPill').textContent=activeCount
+    ?`${activeCount} elemen ditampilkan — centang lebih banyak atau hapus semua`
+    :'Centang elemen di kanan untuk menyorot pada gambar';
+}
+
+function buildNav(){
+  const nl=document.getElementById('navList');
+  nl.innerHTML='';
+  menus.forEach(m=>{
+    const b=document.createElement('button');
+    b.className='nav-btn'+(m.key===cur?' active':'');
+    b.innerHTML=`<div class="nav-icon" style="background:${m.key===cur?'rgba(37,99,235,0.25)':'rgba(255,255,255,0.05)'}"><span style="font-size:13px">${m.icon}</span></div><span class="nav-label">${m.label}</span><span class="nav-count">${m.count}</span>`;
+    b.onclick=()=>{cur=m.key;checked={};buildNav();buildRight();drawAll();};
+    nl.appendChild(b);
+  });
+}
+
+function buildRight(){
+  const m=menus.find(x=>x.key===cur);
+  document.getElementById('rTitle').textContent=m.title;
+  document.getElementById('rDesc').textContent=m.desc;
+  const body=document.getElementById('rBody');
+  let html=`<div class="items-grid">`;
+  m.items.forEach(it=>{
+    html+=`<div class="item-card${checked[it.id]?' on':''}" data-id="${it.id}" onclick="toggle('${it.id}')">
+      <div class="cb"></div>
+      <div class="dot" style="background:${it.color}"></div>
+      <span class="item-label">${it.label}</span>
+    </div>`;
+  });
+  html+=`</div>`;
+  if(m.formula&&m.formula.length){
+    html+=`<div class="formula-box"><div class="formula-title">Rumus &amp; fakta</div>`;
+    m.formula.forEach(([k,v])=>{html+=`<div class="formula-row"><span class="formula-key">${k}</span><span class="formula-val">${v}</span></div>`;});
+    html+=`</div>`;
+  }
+  body.innerHTML=html;
+}
+
+function toggle(id){
+  checked[id]=!checked[id];
+  buildRight();drawAll();
+}
+function checkAll(){
+  const m=menus.find(x=>x.key===cur);
+  m.items.forEach(it=>{checked[it.id]=true;});
+  buildRight();drawAll();
+}
+function clearAll(){
+  checked={};buildRight();drawAll();
+}
+
+buildNav();buildRight();drawAll();
+</script>
+</body>
+</html>

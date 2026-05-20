@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bagian-bagian Prisma Segitiga</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --color-border-tertiary:#e2e8f0;
+  --color-border-secondary:#cbd5e1;
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f8fafc;
+  --color-background-info:#eff6ff;
+  --color-text-primary:#0f172a;
+  --color-text-secondary:#475569;
+  --color-text-tertiary:#94a3b8;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.wrap{display:grid;grid-template-columns:300px 1fr;min-height:560px;border-radius:16px;overflow:hidden;border:0.5px solid var(--color-border-tertiary);width:100%;max-width:780px;box-shadow:0 4px 24px rgba(0,0,0,0.08)}
+.left{background:#0f172a;display:flex;flex-direction:column}
+.left-top{padding:1.25rem 1.25rem 0}
+.app-title{color:#e2e8f0;font-size:17px;font-weight:500;margin-bottom:4px}
+.app-sub{color:#64748b;font-size:11px;margin-bottom:1rem}
+.nav-list{display:flex;flex-direction:column;gap:4px}
+.nav-btn{display:flex;align-items:center;gap:10px;background:transparent;border:none;border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;transition:all 0.15s;width:100%}
+.nav-btn:hover{background:rgba(255,255,255,0.07)}
+.nav-btn.active{background:#1e3a5f}
+.nav-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.nav-label{font-size:12.5px;color:#94a3b8;font-weight:400}
+.nav-btn.active .nav-label{color:#93c5fd}
+.nav-count{margin-left:auto;font-size:11px;background:rgba(148,163,184,0.15);color:#64748b;padding:2px 7px;border-radius:20px}
+.nav-btn.active .nav-count{background:rgba(59,130,246,0.2);color:#60a5fa}
+.canvas-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;gap:0.75rem}
+.info-pill{background:#1e293b;border:0.5px solid #334155;border-radius:20px;padding:6px 14px;font-size:11px;color:#94a3b8;text-align:center;max-width:260px;line-height:1.5}
+.right{background:var(--color-background-primary);display:flex;flex-direction:column}
+.right-header{padding:1.25rem 1.25rem 0.75rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.right-title{font-size:16px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.right-desc{font-size:12.5px;color:var(--color-text-secondary);line-height:1.6}
+.right-body{padding:1rem 1.25rem;flex:1;overflow-y:auto}
+.items-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.item-card{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:10px;border:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:all 0.15s;user-select:none}
+.item-card:hover{background:var(--color-background-secondary)}
+.item-card.on{border-color:transparent;background:var(--color-background-info)}
+.cb{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--color-border-secondary);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.item-card.on .cb{background:#2563eb;border-color:#2563eb;color:#fff;font-size:10px}
+.item-card.on .cb::after{content:'✓'}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.item-label{font-size:12px;color:var(--color-text-primary);line-height:1.3}
+.item-card.on .item-label{color:#1d4ed8}
+.formula-box{margin-top:1rem;background:var(--color-background-secondary);border-radius:10px;padding:0.75rem 1rem}
+.formula-title{font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.formula-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.formula-row:last-child{border-bottom:none}
+.formula-key{color:var(--color-text-secondary)}
+.formula-val{color:var(--color-text-primary);font-weight:500}
+.bottom-bar{padding:0.75rem 1.25rem;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:6px}
+.action-btn{flex:1;padding:7px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);font-size:12px;cursor:pointer;transition:background 0.12s}
+.action-btn:hover{background:var(--color-background-secondary)}
+</style>
+</head>
+<body>
+
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Aplikasi interaktif bagian-bagian prisma segitiga ABC.DEF: rusuk, titik sudut, bidang sisi, diagonal bidang, dan bidang diagonal</h2>
+
+<div class="wrap">
+  <div class="left">
+    <div class="left-top">
+      <div class="app-title">Bagian-bagian Prisma Segitiga</div>
+      <div class="app-sub">Prisma ABC.DEF — klik menu untuk menjelajahi</div>
+      <div class="nav-list" id="navList"></div>
+    </div>
+    <div class="canvas-area">
+      <canvas id="c" width="270" height="210"></canvas>
+      <div class="info-pill" id="infoPill">Pilih menu lalu centang elemen untuk menyorotnya</div>
+    </div>
+  </div>
+  <div class="right">
+    <div class="right-header">
+      <div class="right-title" id="rTitle">Selamat datang</div>
+      <div class="right-desc" id="rDesc">Pilih salah satu bagian prisma segitiga dari menu di sebelah kiri untuk mulai belajar.</div>
+    </div>
+    <div class="right-body" id="rBody"></div>
+    <div class="bottom-bar">
+      <button class="action-btn" onclick="checkAll()">Tampilkan semua</button>
+      <button class="action-btn" onclick="clearAll()">Hapus semua</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Prisma segitiga ABC.DEF
+// Alas: segitiga ABC (bawah), Tutup: segitiga DEF (atas)
+// A-D, B-E, C-F = rusuk tegak
+
+const menus=[
+  {key:'titikSudut',label:'Titik Sudut',icon:'⬡',count:'6',color:'#f59e0b',
+   title:'Titik sudut prisma segitiga',
+   desc:'Prisma segitiga memiliki 6 titik sudut: 3 titik pada alas (A, B, C) dan 3 titik pada tutup (D, E, F).',
+   formula:[['Jumlah','6 titik'],['Alas','A, B, C'],['Tutup','D, E, F']],
+   items:[
+     {id:'alas',label:'Titik alas (A, B, C)',color:'#f59e0b'},
+     {id:'atas',label:'Titik tutup (D, E, F)',color:'#fcd34d'}
+   ]},
+  {key:'rusuk',label:'Rusuk',icon:'━',count:'9',color:'#60a5fa',
+   title:'Rusuk prisma segitiga',
+   desc:'Prisma segitiga memiliki 9 rusuk: 3 rusuk alas, 3 rusuk tutup, dan 3 rusuk tegak (tinggi prisma).',
+   formula:[['Rusuk alas (AB, BC, CA)','a'],['Rusuk tutup (DE, EF, FD)','a'],['Rusuk tegak (AD, BE, CF)','t']],
+   items:[
+     {id:'ra',label:'Rusuk alas × 3',color:'#60a5fa'},
+     {id:'rt',label:'Rusuk tutup × 3',color:'#34d399'},
+     {id:'rtg',label:'Rusuk tegak × 3',color:'#f472b6'}
+   ]},
+  {key:'bidangSisi',label:'Bidang Sisi',icon:'▣',count:'5',color:'#a78bfa',
+   title:'Bidang sisi prisma segitiga',
+   desc:'Prisma segitiga memiliki 5 bidang sisi: 2 sisi segitiga (alas dan tutup) serta 3 sisi persegi panjang (sisi tegak).',
+   formula:[['Luas alas/tutup','½ × a × t△'],['Luas sisi tegak','a × t'],['Total sisi','5 bidang']],
+   items:[
+     {id:'ABC',label:'ABC — alas',color:'#ef4444'},
+     {id:'DEF',label:'DEF — tutup',color:'#f97316'},
+     {id:'ABDE',label:'ABDE — depan',color:'#eab308'},
+     {id:'BCEF',label:'BCEF — kanan',color:'#22c55e'},
+     {id:'CAFD',label:'CAFD — kiri',color:'#06b6d4'}
+   ]},
+  {key:'diagBidang',label:'Diagonal Bidang',icon:'╲',count:'3',color:'#fb923c',
+   title:'Diagonal bidang prisma segitiga',
+   desc:'Prisma segitiga memiliki 3 diagonal bidang, masing-masing 1 pada setiap sisi persegi panjang (sisi tegak).',
+   formula:[['Diagonal ABDE','√(a²+t²)'],['Diagonal BCEF','√(a²+t²)'],['Diagonal CAFD','√(a²+t²)']],
+   items:[
+     {id:'db1',label:'AE & BD (sisi depan)',color:'#f43f5e'},
+     {id:'db2',label:'BF & CE (sisi kanan)',color:'#fb923c'},
+     {id:'db3',label:'CD & AF (sisi kiri)',color:'#facc15'}
+   ]}
+];
+
+let cur='rusuk', checked={};
+
+const W=270, H=210;
+const cv=document.getElementById('c');
+const cx=cv.getContext('2d');
+
+// Koordinat titik prisma segitiga (proyeksi perspektif)
+// Alas (bawah): A (kiri), B (kanan), C (belakang-tengah, ditampilkan agak ke atas & kanan dengan offset)
+// Tutup (atas): D, E, F bersesuaian
+
+const P = {
+  // Alas segitiga (bawah)
+  A: [42,  168],
+  B: [178, 168],
+  C: [110+30, 140],   // titik "belakang" alas, diberi offset kanan+atas untuk perspektif
+  // Tutup segitiga (atas)
+  D: [42,  62],
+  E: [178, 62],
+  F: [110+30, 34]
+};
+
+// Label offset
+const loff={
+  A:[-16, 12],
+  B:[  5, 12],
+  C:[  6,  0],
+  D:[-16, -6],
+  E:[  5, -6],
+  F:[  6, -8]
+};
+
+function seg(a,b,col,w,dash){
+  cx.save();cx.beginPath();cx.strokeStyle=col;cx.lineWidth=w;cx.setLineDash(dash||[]);
+  cx.moveTo(...P[a]);cx.lineTo(...P[b]);cx.stroke();cx.restore();
+}
+function face(pts,col,alpha){
+  cx.save();cx.globalAlpha=alpha||0.22;cx.fillStyle=col;cx.beginPath();
+  cx.moveTo(...P[pts[0]]);pts.slice(1).forEach(p=>cx.lineTo(...P[p]));
+  cx.closePath();cx.fill();
+  cx.globalAlpha=(alpha||0.22)+0.55;cx.strokeStyle=col;cx.lineWidth=2;cx.stroke();cx.restore();
+}
+function dot(p,col,r){
+  cx.save();cx.beginPath();cx.arc(...P[p],r,0,Math.PI*2);cx.fillStyle=col;cx.fill();cx.restore();
+}
+function diagLine(a,b,col){
+  cx.save();cx.beginPath();cx.strokeStyle=col;cx.lineWidth=2.5;cx.setLineDash([]);
+  cx.moveTo(...P[a]);cx.lineTo(...P[b]);cx.stroke();cx.restore();
+}
+
+function drawAll(){
+  cx.clearRect(0,0,W,H);
+  const base='#475569', dim='#334155';
+
+  // Garis rangka dasar
+  // Rusuk alas: AB tampak, AC & BC = sisi yg ada C (belakang) → BC sebaiknya putus
+  seg('A','B',base,1.5);
+  seg('B','C',base,1,[5,4]);   // rusuk alas belakang
+  seg('A','C',dim,1,[5,4]);    // rusuk alas kiri-belakang
+
+  // Rusuk tutup
+  seg('D','E',base,1.5);
+  seg('E','F',base,1.5);
+  seg('D','F',base,1.5);
+
+  // Rusuk tegak
+  seg('A','D',base,1.5);
+  seg('B','E',base,1.5);
+  seg('C','F',dim,1,[5,4]);    // rusuk tegak belakang
+
+  const m = menus.find(x=>x.key===cur);
+
+  // Titik sudut
+  if(cur==='titikSudut'){
+    ['A','B','C'].forEach(p=>dot(p,checked['alas']?'#f59e0b':'#475569',checked['alas']?5.5:3));
+    ['D','E','F'].forEach(p=>dot(p,checked['atas']?'#fcd34d':'#475569',checked['atas']?5.5:3));
+  } else {
+    Object.keys(P).forEach(p=>dot(p,'#475569',3));
+  }
+
+  // Rusuk
+  if(cur==='rusuk'){
+    if(checked['ra']){
+      seg('A','B','#60a5fa',3);
+      seg('B','C','#60a5fa',3,[5,4]);
+      seg('A','C','#60a5fa',3,[5,4]);
+    }
+    if(checked['rt']){
+      seg('D','E','#34d399',3);
+      seg('E','F','#34d399',3);
+      seg('D','F','#34d399',3);
+    }
+    if(checked['rtg']){
+      seg('A','D','#f472b6',3);
+      seg('B','E','#f472b6',3);
+      seg('C','F','#f472b6',3,[5,4]);
+    }
+  }
+
+  // Bidang sisi
+  if(cur==='bidangSisi'){
+    const fs={
+      ABC:['A','B','C'],
+      DEF:['D','E','F'],
+      ABDE:['A','B','E','D'],
+      BCEF:['B','C','F','E'],
+      CAFD:['C','A','D','F']
+    };
+    m.items.forEach(it=>{if(checked[it.id]&&fs[it.id])face(fs[it.id],it.color);});
+  }
+
+  // Diagonal bidang
+  if(cur==='diagBidang'){
+    if(checked['db1']){diagLine('A','E','#f43f5e');diagLine('B','D','#f43f5e');}
+    if(checked['db2']){diagLine('B','F','#fb923c');diagLine('C','E','#fb923c');}
+    if(checked['db3']){diagLine('C','D','#facc15');diagLine('A','F','#facc15');}
+  }
+
+  // Label titik
+  cx.fillStyle='#94a3b8';cx.font='bold 11px sans-serif';
+  Object.entries(P).forEach(([n,[x,y]])=>{
+    const[dx,dy]=loff[n];cx.fillText(n,x+dx,y+dy);
+  });
+
+  const activeCount=Object.values(checked).filter(Boolean).length;
+  document.getElementById('infoPill').textContent=activeCount
+    ?`${activeCount} elemen ditampilkan — centang lebih banyak atau hapus semua`
+    :'Centang elemen di kanan untuk menyorot pada gambar';
+}
+
+function buildNav(){
+  const nl=document.getElementById('navList');
+  nl.innerHTML='';
+  menus.forEach(m=>{
+    const b=document.createElement('button');
+    b.className='nav-btn'+(m.key===cur?' active':'');
+    b.innerHTML=`<div class="nav-icon" style="background:${m.key===cur?'rgba(37,99,235,0.25)':'rgba(255,255,255,0.05)'}"><span style="font-size:13px">${m.icon}</span></div><span class="nav-label">${m.label}</span><span class="nav-count">${m.count}</span>`;
+    b.onclick=()=>{cur=m.key;checked={};buildNav();buildRight();drawAll();};
+    nl.appendChild(b);
+  });
+}
+
+function buildRight(){
+  const m=menus.find(x=>x.key===cur);
+  document.getElementById('rTitle').textContent=m.title;
+  document.getElementById('rDesc').textContent=m.desc;
+  const body=document.getElementById('rBody');
+  let html=`<div class="items-grid">`;
+  m.items.forEach(it=>{
+    html+=`<div class="item-card${checked[it.id]?' on':''}" data-id="${it.id}" onclick="toggle('${it.id}')">
+      <div class="cb"></div>
+      <div class="dot" style="background:${it.color}"></div>
+      <span class="item-label">${it.label}</span>
+    </div>`;
+  });
+  html+=`</div>`;
+  if(m.formula&&m.formula.length){
+    html+=`<div class="formula-box"><div class="formula-title">Rumus &amp; fakta</div>`;
+    m.formula.forEach(([k,v])=>{html+=`<div class="formula-row"><span class="formula-key">${k}</span><span class="formula-val">${v}</span></div>`;});
+    html+=`</div>`;
+  }
+  body.innerHTML=html;
+}
+
+function toggle(id){
+  checked[id]=!checked[id];
+  buildRight();drawAll();
+}
+function checkAll(){
+  const m=menus.find(x=>x.key===cur);
+  m.items.forEach(it=>{checked[it.id]=true;});
+  buildRight();drawAll();
+}
+function clearAll(){
+  checked={};buildRight();drawAll();
+}
+
+buildNav();buildRight();drawAll();
+</script>
+</body>
+</html>

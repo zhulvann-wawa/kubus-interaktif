@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eksplorasi Volume & Perubahan Skala — BRSD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F3EC;
+    --grid:#CFE0DE;
+    --ink:#1C3B3A;
+    --ink-soft:#4B6664;
+    --coral:#E4713E;
+    --teal:#2E8C86;
+    --teal-deep:#1F6864;
+    --card:#FFFFFF;
+    --line:#D8CFBE;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/28px 28px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/28px 28px,
+      var(--paper);
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:36px 24px 80px;}
+  header{padding:8px 0 28px;border-bottom:2px solid var(--ink);margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);font-weight:600;}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,42px);line-height:1.05;margin:10px 0 8px;font-weight:700;}
+  .lede{font-size:16px;color:var(--ink-soft);max-width:620px;line-height:1.55;}
+  .badge-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;border:1.5px solid var(--ink);padding:4px 10px;border-radius:999px;}
+
+  section{margin-bottom:44px;}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;}
+  .sec-num{font-family:'JetBrains Mono',monospace;color:var(--coral);font-weight:700;font-size:14px;}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0;font-weight:600;}
+
+  .panel{
+    background:var(--card);
+    border:1.5px solid var(--ink);
+    border-radius:14px;
+    padding:24px;
+    box-shadow:5px 5px 0 rgba(28,59,58,0.08);
+  }
+
+  /* --- shape explorer --- */
+  .explorer{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;}
+  @media (max-width:720px){.explorer{grid-template-columns:1fr;}}
+  .stage{
+    display:flex;align-items:center;justify-content:center;
+    min-height:260px;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(46,140,134,0.06), transparent 65%);
+    border:1.5px dashed var(--line);
+    border-radius:10px;
+  }
+  #shapeSvg{max-width:100%;}
+  .face-top{transition:d .2s;}
+  .face-front{transition:d .2s;}
+  .face-side{transition:d .2s;}
+
+  .controls label{display:block;font-family:'JetBrains Mono',monospace;font-size:12px;margin:14px 0 6px;color:var(--ink-soft);transition:opacity .15s;}
+  .controls input[type=range]{width:100%;accent-color:var(--coral);}
+  .readout{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;}
+  .stat{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;flex:1;min-width:120px;}
+  .stat .k{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;}
+  .stat .v{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--teal-deep);}
+  select{font-family:'Inter',sans-serif;font-size:14px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--ink);background:var(--card);width:100%;}
+  .formula-note{margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--coral);background:#FDF1EA;border-radius:8px;padding:8px 12px;}
+
+  /* --- scale experiment --- */
+  .scale-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  @media (max-width:720px){.scale-grid{grid-template-columns:1fr;}}
+  .kbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .kbtn{font-family:'JetBrains Mono',monospace;border:1.5px solid var(--ink);background:var(--card);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;}
+  .kbtn.active{background:var(--coral);color:#fff;border-color:var(--coral);}
+  .bars{display:flex;align-items:flex-end;gap:16px;height:180px;margin-top:18px;border-bottom:2px solid var(--ink);padding-bottom:4px;}
+  .bar-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;height:100%;}
+  .bar{width:70%;background:linear-gradient(180deg,var(--teal),var(--teal-deep));border-radius:6px 6px 0 0;transition:height .3s;}
+  .bar-label{font-family:'JetBrains Mono',monospace;font-size:11px;margin-top:6px;color:var(--ink-soft);}
+  .insight{margin-top:16px;padding:14px 16px;background:#FDF1EA;border-left:4px solid var(--coral);border-radius:0 8px 8px 0;font-size:14.5px;line-height:1.5;}
+
+  /* --- quiz --- */
+  .quiz-card{margin-bottom:16px;}
+  .qtext{font-weight:600;margin-bottom:12px;font-size:15.5px;}
+  .opts{display:grid;gap:8px;}
+  .opt{border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;cursor:pointer;font-size:14.5px;background:var(--paper);transition:.15s;}
+  .opt:hover{border-color:var(--teal);}
+  .opt.correct{background:#E4F4EE;border-color:var(--teal-deep);font-weight:600;}
+  .opt.wrong{background:#FBE8E3;border-color:var(--coral);}
+  .fb{margin-top:10px;font-size:13.5px;color:var(--ink-soft);display:none;}
+  .fb.show{display:block;}
+  .score-pill{position:sticky;top:12px;float:right;font-family:'JetBrains Mono',monospace;background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;}
+
+  .quiz-reset{display:none;margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;border:1.5px solid var(--ink);background:var(--card);padding:8px 16px;border-radius:8px;cursor:pointer;}
+  .quiz-reset.show{display:inline-block;}
+
+  footer{margin-top:50px;padding-top:20px;border-top:1.5px solid var(--line);font-size:12.5px;color:var(--ink-soft);text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Media Pembelajaran Digital · TP3 & TP4 · Fase D</div>
+    <h1>Eksplorasi Volume &amp; Perubahan Skala<br>Bangun Ruang Sisi Datar</h1>
+    <p class="lede">Geser, ubah, dan amati. Media ini membantumu <em>melihat</em> mengapa volume berubah jauh lebih cepat daripada panjang rusuknya — bukan sekadar menghafal rumus.</p>
+    <div class="badge-row">
+      <span class="badge">Prisma Segitiga &amp; Limas Segiempat</span>
+      <span class="badge">Perubahan Skala k³</span>
+      <span class="badge">Kuis Jaring-Jaring</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Simulator Bentuk &amp; Volume</h2></div>
+    <div class="panel explorer">
+      <div class="stage">
+        <svg id="shapeSvg" viewBox="0 0 300 260" width="100%" height="260"></svg>
+      </div>
+      <div class="controls">
+        <label for="shapeSel">Pilih Bangun</label>
+        <select id="shapeSel">
+          <option value="prism">Prisma Segitiga Siku-Siku</option>
+          <option value="pyramid">Limas Segiempat</option>
+        </select>
+
+        <label for="pRange" id="pLabel">Panjang (p) — <span id="pVal">4</span> cm</label>
+        <input type="range" id="pRange" min="1" max="8" value="4" step="1">
+
+        <label for="lRange" id="lLabel">Lebar (l) — <span id="lVal">4</span> cm</label>
+        <input type="range" id="lRange" min="1" max="8" value="4" step="1">
+
+        <label for="tRange" id="tLabel">Tinggi (t) — <span id="tVal">4</span> cm</label>
+        <input type="range" id="tRange" min="1" max="8" value="4" step="1">
+
+        <div class="readout">
+          <div class="stat"><div class="k">Luas Permukaan</div><div class="v" id="lpOut">96 cm²</div></div>
+          <div class="stat"><div class="k">Volume</div><div class="v" id="volOut">64 cm³</div></div>
+        </div>
+        <div class="formula-note" id="formulaNote">LP = 6s² &nbsp;|&nbsp; V = s³</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Eksperimen Perubahan Skala</h2></div>
+    <div class="panel scale-grid">
+      <div>
+        <p style="margin-top:0;font-size:14.5px;">Sebuah kubus rusuk 2 cm diperbesar sebanyak <b>k</b> kali. Pilih nilai k untuk melihat perubahan volumenya:</p>
+        <div class="kbtns" id="kBtns">
+          <button class="kbtn active" data-k="1">k = 1</button>
+          <button class="kbtn" data-k="2">k = 2</button>
+          <button class="kbtn" data-k="3">k = 3</button>
+          <button class="kbtn" data-k="4">k = 4</button>
+        </div>
+        <div class="insight" id="insightBox">Saat k = 1, rusuk = 2 cm, volume = 8 cm³. Ini menjadi acuan (baseline) perbandingan.</div>
+      </div>
+      <div>
+        <div class="bars" id="barsWrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Kuis Cepat: Uji Pemahamanmu</h2></div>
+    <div class="score-pill" id="scorePill">Skor: 0 / 4</div>
+    <div class="panel">
+      <div id="quizArea"></div>
+      <button class="quiz-reset" id="quizReset">↺ Ulangi Kuis</button>
+    </div>
+  </section>
+
+  <footer>Perangkat Pembelajaran Matematika BRSD — Naswa Resaptania Zhulvan (2024004010) — Pendidikan Matematika, FKIP, UST</footer>
+</div>
+
+<script>
+// ============ Shape explorer (SVG isometric) ============
+const shapeSel = document.getElementById('shapeSel');
+const pRange = document.getElementById('pRange'), lRange = document.getElementById('lRange'), tRange = document.getElementById('tRange');
+const pVal = document.getElementById('pVal'), lVal = document.getElementById('lVal'), tVal = document.getElementById('tVal');
+const pLabel = document.getElementById('pLabel'), lLabel = document.getElementById('lLabel'), tLabel = document.getElementById('tLabel');
+const lpOut = document.getElementById('lpOut'), volOut = document.getElementById('volOut');
+const formulaNote = document.getElementById('formulaNote');
+const svg = document.getElementById('shapeSvg');
+
+const SCALE = 10;
+const ORIGIN_X = 150, ORIGIN_Y = 175;
+const COS30 = Math.cos(Math.PI/6);
+
+// project 3D point (x right, y up, z depth) to 2D screen coords
+function iso(x, y, z){
+  const sx = (x - z) * COS30;
+  const sy = (x + z) * 0.5 - y;
+  return [ORIGIN_X + sx * SCALE, ORIGIN_Y - sy * SCALE];
+}
+function poly(points, fill, stroke, opacity, dash){
+  const d = points.map(p => iso(...p)).map(p => p.join(',')).join(' ');
+  return `<polygon points="${d}" fill="${fill}" fill-opacity="${opacity}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" ${dash ? `stroke-dasharray="${dash}"`:''}/>`;
+}
+
+const TEAL = 'var(--teal)', TEAL_DEEP = 'var(--teal-deep)', CORAL = 'var(--coral)', INK = 'var(--ink)';
+
+function drawPrism(p, l, t){
+  // right-triangle base in x-z plane, extruded vertically by t
+  const P0=[0,0,0], P1=[p,0,0], P2=[0,0,l];
+  const P0t=[0,t,0], P1t=[p,t,0], P2t=[0,t,l];
+  return poly([P0t,P1t,P2t], CORAL, INK, 0.7) +          // top triangle
+         poly([P0,P1,P1t,P0t], TEAL, INK, 0.55) +         // front rectangular face
+         poly([P1,P2,P2t,P1t], TEAL_DEEP, INK, 0.75) +    // hypotenuse face
+         `<line x1="${iso(...P0)[0]}" y1="${iso(...P0)[1]}" x2="${iso(...P2)[0]}" y2="${iso(...P2)[1]}" stroke="${INK}" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.5"/>` +
+         `<line x1="${iso(...P0t)[0]}" y1="${iso(...P0t)[1]}" x2="${iso(...P2t)[0]}" y2="${iso(...P2t)[1]}" stroke="${INK}" stroke-width="1.5" opacity="0.4"/>`;
+}
+
+function drawPyramid(p, l, t){
+  const A=[0,0,0], B=[p,0,0], C=[p,0,l], D=[0,0,l];
+  const Apex=[p/2, t, l/2];
+  const base = `<polygon points="${[A,B,C,D].map(v=>iso(...v).join(',')).join(' ')}" fill="none" stroke="${INK}" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.5"/>`;
+  return base +
+         poly([A,D,Apex], TEAL_DEEP, INK, 0.45, '') +  // hidden-ish left face
+         poly([A,B,Apex], CORAL, INK, 0.7) +            // front face (highlighted)
+         poly([B,C,Apex], TEAL, INK, 0.7);               // right face
+}
+
+function updateShape(){
+  const shape = shapeSel.value;
+  const p = +pRange.value, l = +lRange.value, t = +tRange.value;
+  pVal.textContent = p; lVal.textContent = l; tVal.textContent = t;
+
+  const labelMap = {
+    prism:   ['Sisi Siku-siku a (p)', 'Sisi Siku-siku b (l)', 'Tinggi Prisma (t)'],
+    pyramid: ['Panjang Alas (p)', 'Lebar Alas (l)', 'Tinggi Limas (t)']
+  };
+  const [lp, ll, lt] = labelMap[shape];
+  pLabel.innerHTML = `${lp} — <span id="pVal">${p}</span> cm`;
+  lLabel.innerHTML = `${ll} — <span id="lVal">${l}</span> cm`;
+  tLabel.innerHTML = `${lt} — <span id="tVal">${t}</span> cm`;
+
+  let lp_val, vol, svgHtml, note;
+
+  if(shape === 'prism'){
+    const hyp = Math.sqrt(p*p + l*l);
+    lp_val = p*l + t*(p + l + hyp); // 2 triangle ends + 3 rectangular sides
+    vol = 0.5*p*l*t;
+    svgHtml = drawPrism(p, l, t);
+    note = 'V = (½ × a × b) × t &nbsp;|&nbsp; LP = (a×b) + t(a+b+c)';
+  } else { // pyramid
+    const slant1 = Math.sqrt(t*t + (l/2)*(l/2));
+    const slant2 = Math.sqrt(t*t + (p/2)*(p/2));
+    lp_val = p*l + p*slant1 + l*slant2;
+    vol = (1/3)*p*l*t;
+    svgHtml = drawPyramid(p, l, t);
+    note = 'V = ⅓ × L.alas × t &nbsp;|&nbsp; LP = L.alas + ΣL.selimut';
+  }
+
+  lpOut.textContent = Math.round(lp_val*100)/100 + ' cm²';
+  volOut.textContent = Math.round(vol*100)/100 + ' cm³';
+  formulaNote.innerHTML = note;
+  svg.innerHTML = svgHtml;
+}
+
+[shapeSel, pRange, lRange, tRange].forEach(el => el.addEventListener('input', updateShape));
+updateShape();
+
+// ============ Scale experiment ============
+const kBtns = document.querySelectorAll('.kbtn');
+const barsWrap = document.getElementById('barsWrap');
+const insightBox = document.getElementById('insightBox');
+const baseEdge = 2;
+
+function renderBars(activeK){
+  barsWrap.innerHTML = '';
+  const maxVol = Math.pow(baseEdge*4,3);
+  [1,2,3,4].forEach(k=>{
+    const edge = baseEdge*k;
+    const vol = Math.pow(edge,3);
+    const heightPct = (vol/maxVol)*100;
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+    col.innerHTML = `<div class="bar" style="height:${heightPct}%;opacity:${k==activeK?1:0.35}"></div><div class="bar-label">k=${k}<br>${vol} cm³</div>`;
+    barsWrap.appendChild(col);
+  });
+}
+renderBars(1);
+
+kBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    kBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const k = +btn.dataset.k;
+    const edge = baseEdge*k;
+    const vol = Math.pow(edge,3);
+    const baseVol = Math.pow(baseEdge,3);
+    renderBars(k);
+    insightBox.textContent = k===1
+      ? `Saat k = 1, rusuk = ${baseEdge} cm, volume = ${baseVol} cm³. Ini menjadi acuan (baseline) perbandingan.`
+      : `Saat k = ${k}, rusuk menjadi ${edge} cm (naik ${k} kali), tetapi volume menjadi ${vol} cm³ — yaitu ${Math.pow(k,3)} kali volume awal (k³ = ${k}³ = ${Math.pow(k,3)}). Volume tumbuh jauh lebih cepat daripada panjang rusuknya!`;
+  });
+});
+
+// ============ Quiz ============
+const quizData = [
+  {
+    q: "1. Perhatikan susunan 6 persegi berikut: satu baris memanjang berisi 4 persegi, dan masing-masing 1 persegi menempel di atas persegi kedua dan di bawah persegi ketiga (bentuk 'zig-zag'). Apakah ini jaring-jaring kubus yang valid?",
+    opts: ["Ya, valid — dapat dilipat membentuk kubus tertutup sempurna", "Tidak valid — akan ada sisi yang bertumpuk saat dilipat"],
+    correct: 0,
+    fb: "Benar! Susunan ini adalah salah satu dari 11 jaring-jaring kubus yang valid. Susunan zig-zag dengan pola 1-4-1 adalah salah satu pola klasik yang jika dilipat akan menutup sempurna tanpa tumpang tindih."
+  },
+  {
+    q: "2. Sebuah balok berukuran 8 cm × 5 cm × 3 cm. Berapa volume balok tersebut?",
+    opts: ["16 cm³", "120 cm³", "80 cm³"],
+    correct: 1,
+    fb: "Benar! V = p × l × t = 8 × 5 × 3 = 120 cm³."
+  },
+  {
+    q: "3. Jika panjang rusuk sebuah kubus diperbesar 2 kali lipat, volumenya menjadi berapa kali volume semula?",
+    opts: ["2 kali", "4 kali", "8 kali"],
+    correct: 2,
+    fb: "Benar! Karena volume berubah secara kubik: (2k)³ = 2³ × k³ = 8 kali volume semula, bukan 2 kali."
+  },
+  {
+    q: "4. Sebuah limas segiempat memiliki luas alas 36 cm² dan tinggi 9 cm. Berapa volumenya?",
+    opts: ["324 cm³", "108 cm³", "162 cm³"],
+    correct: 1,
+    fb: "Benar! V = ⅓ × L.alas × t = ⅓ × 36 × 9 = 108 cm³. Ingat faktor ⅓ pada limas, berbeda dengan prisma!"
+  }
+];
+
+let score = 0;
+const quizArea = document.getElementById('quizArea');
+const scorePill = document.getElementById('scorePill');
+const quizReset = document.getElementById('quizReset');
+
+function buildQuiz(){
+  score = 0;
+  quizArea.innerHTML = '';
+  scorePill.textContent = `Skor: 0 / ${quizData.length}`;
+  quizReset.classList.remove('show');
+  let answeredCount = 0;
+
+  quizData.forEach((item)=>{
+    const card = document.createElement('div');
+    card.className = 'quiz-card';
+    card.innerHTML = `<div class="qtext">${item.q}</div><div class="opts"></div><div class="fb"></div>`;
+    const optsWrap = card.querySelector('.opts');
+    const fb = card.querySelector('.fb');
+    let answered = false;
+    item.opts.forEach((optText, oi)=>{
+      const opt = document.createElement('div');
+      opt.className = 'opt';
+      opt.textContent = optText;
+      opt.addEventListener('click', ()=>{
+        if(answered) return;
+        answered = true;
+        answeredCount++;
+        [...optsWrap.children].forEach((c,ci)=>{
+          if(ci===item.correct) c.classList.add('correct');
+          else if(ci===oi) c.classList.add('wrong');
+        });
+        if(oi===item.correct){ score++; scorePill.textContent = `Skor: ${score} / ${quizData.length}`; }
+        fb.textContent = item.fb;
+        fb.classList.add('show');
+        if(answeredCount === quizData.length){ quizReset.classList.add('show'); }
+      });
+      optsWrap.appendChild(opt);
+    });
+    quizArea.appendChild(card);
+  });
+}
+buildQuiz();
+quizReset.addEventListener('click', buildQuiz);
+</script>
+</body>
+</html>

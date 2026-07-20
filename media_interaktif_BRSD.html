@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eksplorasi Volume & Perubahan Skala — BRSD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F3EC;
+    --grid:#CFE0DE;
+    --ink:#1C3B3A;
+    --ink-soft:#4B6664;
+    --coral:#E4713E;
+    --teal:#2E8C86;
+    --teal-deep:#1F6864;
+    --card:#FFFFFF;
+    --line:#D8CFBE;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/28px 28px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/28px 28px,
+      var(--paper);
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:36px 24px 80px;}
+  header{padding:8px 0 28px;border-bottom:2px solid var(--ink);margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);font-weight:600;}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,42px);line-height:1.05;margin:10px 0 8px;font-weight:700;}
+  .lede{font-size:16px;color:var(--ink-soft);max-width:620px;line-height:1.55;}
+  .badge-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;border:1.5px solid var(--ink);padding:4px 10px;border-radius:999px;}
+
+  section{margin-bottom:44px;}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;}
+  .sec-num{font-family:'JetBrains Mono',monospace;color:var(--coral);font-weight:700;font-size:14px;}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0;font-weight:600;}
+
+  .panel{
+    background:var(--card);
+    border:1.5px solid var(--ink);
+    border-radius:14px;
+    padding:24px;
+    box-shadow:5px 5px 0 rgba(28,59,58,0.08);
+  }
+
+  /* --- shape explorer --- */
+  .explorer{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;}
+  @media (max-width:720px){.explorer{grid-template-columns:1fr;}}
+  .stage{
+    perspective:900px;
+    display:flex;align-items:center;justify-content:center;
+    min-height:260px;
+  }
+  .cube-holder{transform-style:preserve-3d;transform:rotateX(-22deg) rotateY(-34deg);transition:width .15s,height .15s;position:relative;}
+  .face{position:absolute;border:2px solid var(--teal-deep);background:rgba(46,140,134,0.55);}
+  .face.top{background:rgba(228,113,62,0.65);border-color:var(--coral);}
+
+  .controls label{display:block;font-family:'JetBrains Mono',monospace;font-size:12px;margin:14px 0 6px;color:var(--ink-soft);}
+  .controls input[type=range]{width:100%;accent-color:var(--coral);}
+  .readout{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;}
+  .stat{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;flex:1;min-width:120px;}
+  .stat .k{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;}
+  .stat .v{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--teal-deep);}
+  select{font-family:'Inter',sans-serif;font-size:14px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--ink);background:var(--card);}
+
+  /* --- scale experiment --- */
+  .scale-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  @media (max-width:720px){.scale-grid{grid-template-columns:1fr;}}
+  .kbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .kbtn{font-family:'JetBrains Mono',monospace;border:1.5px solid var(--ink);background:var(--card);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;}
+  .kbtn.active{background:var(--coral);color:#fff;border-color:var(--coral);}
+  .bars{display:flex;align-items:flex-end;gap:16px;height:180px;margin-top:18px;border-bottom:2px solid var(--ink);padding-bottom:4px;}
+  .bar-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;height:100%;}
+  .bar{width:70%;background:linear-gradient(180deg,var(--teal),var(--teal-deep));border-radius:6px 6px 0 0;transition:height .3s;}
+  .bar-label{font-family:'JetBrains Mono',monospace;font-size:11px;margin-top:6px;color:var(--ink-soft);}
+  .insight{margin-top:16px;padding:14px 16px;background:#FDF1EA;border-left:4px solid var(--coral);border-radius:0 8px 8px 0;font-size:14.5px;line-height:1.5;}
+
+  /* --- quiz --- */
+  .quiz-card{margin-bottom:16px;}
+  .qtext{font-weight:600;margin-bottom:12px;font-size:15.5px;}
+  .opts{display:grid;gap:8px;}
+  .opt{border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;cursor:pointer;font-size:14.5px;background:var(--paper);transition:.15s;}
+  .opt:hover{border-color:var(--teal);}
+  .opt.correct{background:#E4F4EE;border-color:var(--teal-deep);font-weight:600;}
+  .opt.wrong{background:#FBE8E3;border-color:var(--coral);}
+  .fb{margin-top:10px;font-size:13.5px;color:var(--ink-soft);display:none;}
+  .fb.show{display:block;}
+  .score-pill{position:sticky;top:12px;float:right;font-family:'JetBrains Mono',monospace;background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;}
+
+  footer{margin-top:50px;padding-top:20px;border-top:1.5px solid var(--line);font-size:12.5px;color:var(--ink-soft);text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Media Pembelajaran Digital · TP3 & TP4 · Fase D</div>
+    <h1>Eksplorasi Volume &amp; Perubahan Skala<br>Bangun Ruang Sisi Datar</h1>
+    <p class="lede">Geser, ubah, dan amati. Media ini membantumu <em>melihat</em> mengapa volume berubah jauh lebih cepat daripada panjang rusuknya — bukan sekadar menghafal rumus.</p>
+    <div class="badge-row">
+      <span class="badge">Kubus &amp; Balok</span>
+      <span class="badge">Perubahan Skala k³</span>
+      <span class="badge">Kuis Jaring-Jaring</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Simulator Bentuk &amp; Volume</h2></div>
+    <div class="panel explorer">
+      <div class="stage">
+        <div class="cube-holder" id="cubeHolder"></div>
+      </div>
+      <div class="controls">
+        <label for="shapeSel">Pilih Bangun</label>
+        <select id="shapeSel">
+          <option value="cube">Kubus</option>
+          <option value="block">Balok</option>
+        </select>
+
+        <label for="pRange">Panjang (p) — <span id="pVal">4</span> cm</label>
+        <input type="range" id="pRange" min="1" max="8" value="4" step="1">
+
+        <label for="lRange" id="lLabel">Lebar (l) — <span id="lVal">4</span> cm</label>
+        <input type="range" id="lRange" min="1" max="8" value="4" step="1">
+
+        <label for="tRange" id="tLabel">Tinggi (t) — <span id="tVal">4</span> cm</label>
+        <input type="range" id="tRange" min="1" max="8" value="4" step="1">
+
+        <div class="readout">
+          <div class="stat"><div class="k">Luas Permukaan</div><div class="v" id="lpOut">96 cm²</div></div>
+          <div class="stat"><div class="k">Volume</div><div class="v" id="volOut">64 cm³</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Eksperimen Perubahan Skala</h2></div>
+    <div class="panel scale-grid">
+      <div>
+        <p style="margin-top:0;font-size:14.5px;">Sebuah kubus rusuk 2 cm diperbesar sebanyak <b>k</b> kali. Pilih nilai k untuk melihat perubahan volumenya:</p>
+        <div class="kbtns" id="kBtns">
+          <button class="kbtn active" data-k="1">k = 1</button>
+          <button class="kbtn" data-k="2">k = 2</button>
+          <button class="kbtn" data-k="3">k = 3</button>
+          <button class="kbtn" data-k="4">k = 4</button>
+        </div>
+        <div class="insight" id="insightBox">Saat k = 1, rusuk = 2 cm, volume = 8 cm³. Ini menjadi acuan (baseline) perbandingan.</div>
+      </div>
+      <div>
+        <div class="bars" id="barsWrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Kuis Cepat: Uji Pemahamanmu</h2></div>
+    <div class="score-pill" id="scorePill">Skor: 0 / 4</div>
+    <div class="panel">
+      <div id="quizArea"></div>
+    </div>
+  </section>
+
+  <footer>Perangkat Pembelajaran Matematika BRSD — Naswa Resaptania Zhulvan (2024004010) — Pendidikan Matematika, FKIP, UST</footer>
+</div>
+
+<script>
+// ---------- Shape explorer ----------
+const shapeSel = document.getElementById('shapeSel');
+const pRange = document.getElementById('pRange'), lRange = document.getElementById('lRange'), tRange = document.getElementById('tRange');
+const pVal = document.getElementById('pVal'), lVal = document.getElementById('lVal'), tVal = document.getElementById('tVal');
+const lLabel = document.getElementById('lLabel'), tLabel = document.getElementById('tLabel');
+const lpOut = document.getElementById('lpOut'), volOut = document.getElementById('volOut');
+const cubeHolder = document.getElementById('cubeHolder');
+
+const SCALE = 20; // px per cm
+
+function buildFaces(p,l,t){
+  cubeHolder.innerHTML = '';
+  const w = p*SCALE, d = l*SCALE, h = t*SCALE;
+  cubeHolder.style.width = w+'px';
+  cubeHolder.style.height = h+'px';
+
+  const faces = [
+    {cls:'front', style:`width:${w}px;height:${h}px;transform:translateZ(${d/2}px);`},
+    {cls:'back', style:`width:${w}px;height:${h}px;transform:translateZ(${-d/2}px) rotateY(180deg);`},
+    {cls:'top', style:`width:${w}px;height:${d}px;transform:rotateX(90deg) translateZ(${h/2}px);`},
+    {cls:'bottom', style:`width:${w}px;height:${d}px;transform:rotateX(90deg) translateZ(${-h/2}px);`},
+    {cls:'left', style:`width:${d}px;height:${h}px;transform:rotateY(-90deg) translateZ(${w/2}px);`},
+    {cls:'right', style:`width:${d}px;height:${h}px;transform:rotateY(-90deg) translateZ(${-w/2}px);`},
+  ];
+  faces.forEach(f=>{
+    const div = document.createElement('div');
+    div.className = 'face ' + (f.cls==='top'?'top':'');
+    div.style.cssText += f.style;
+    div.style.left = '50%'; div.style.top='50%';
+    let mw, mh;
+    if(f.cls==='top'||f.cls==='bottom'){ mw = w/2; mh = d/2; }
+    else if(f.cls==='left'||f.cls==='right'){ mw = d/2; mh = h/2; }
+    else { mw = w/2; mh = h/2; }
+    div.style.marginLeft = (-mw)+'px';
+    div.style.marginTop = (-mh)+'px';
+    cubeHolder.appendChild(div);
+  });
+}
+
+function updateShape(){
+  const isCube = shapeSel.value === 'cube';
+  lRange.disabled = isCube; tRange.disabled = isCube;
+  let p = +pRange.value, l = isCube ? p : +lRange.value, t = isCube ? p : +tRange.value;
+  if(isCube){ lRange.value = p; tRange.value = p; }
+  pVal.textContent = p; lVal.textContent = isCube?p:l; tVal.textContent = isCube?p:t;
+  lLabel.style.opacity = isCube?0.4:1; tLabel.style.opacity = isCube?0.4:1;
+
+  const lp = 2*(p*l + p*t + l*t);
+  const vol = p*l*t;
+  lpOut.textContent = lp + ' cm²';
+  volOut.textContent = vol + ' cm³';
+  buildFaces(p,l,t);
+}
+[shapeSel,pRange,lRange,tRange].forEach(el=>el.addEventListener('input', updateShape));
+updateShape();
+
+// ---------- Scale experiment ----------
+const kBtns = document.querySelectorAll('.kbtn');
+const barsWrap = document.getElementById('barsWrap');
+const insightBox = document.getElementById('insightBox');
+const baseEdge = 2;
+
+function renderBars(activeK){
+  barsWrap.innerHTML = '';
+  const maxVol = Math.pow(baseEdge*4,3);
+  [1,2,3,4].forEach(k=>{
+    const edge = baseEdge*k;
+    const vol = Math.pow(edge,3);
+    const heightPct = (vol/maxVol)*100;
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+    col.innerHTML = `<div class="bar" style="height:${heightPct}%;opacity:${k==activeK?1:0.35}"></div><div class="bar-label">k=${k}<br>${vol} cm³</div>`;
+    barsWrap.appendChild(col);
+  });
+}
+renderBars(1);
+
+kBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    kBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const k = +btn.dataset.k;
+    const edge = baseEdge*k;
+    const vol = Math.pow(edge,3);
+    const baseVol = Math.pow(baseEdge,3);
+    renderBars(k);
+    insightBox.textContent = k===1
+      ? `Saat k = 1, rusuk = ${baseEdge} cm, volume = ${baseVol} cm³. Ini menjadi acuan (baseline) perbandingan.`
+      : `Saat k = ${k}, rusuk menjadi ${edge} cm (naik ${k} kali), tetapi volume menjadi ${vol} cm³ — yaitu ${Math.pow(k,3)} kali volume awal (k³ = ${k}³ = ${Math.pow(k,3)}). Volume tumbuh jauh lebih cepat daripada panjang rusuknya!`;
+  });
+});
+
+// ---------- Quiz ----------
+const quizData = [
+  {
+    q: "1. Perhatikan susunan 6 persegi berikut: satu baris memanjang berisi 4 persegi, dan masing-masing 1 persegi menempel di atas persegi kedua dan di bawah persegi ketiga (bentuk 'zig-zag'). Apakah ini jaring-jaring kubus yang valid?",
+    opts: ["Ya, valid — dapat dilipat membentuk kubus tertutup sempurna", "Tidak valid — akan ada sisi yang bertumpuk saat dilipat"],
+    correct: 0,
+    fb: "Benar! Susunan ini adalah salah satu dari 11 jaring-jaring kubus yang valid. Susunan zig-zag dengan pola 1-4-1 adalah salah satu pola klasik yang jika dilipat akan menutup sempurna tanpa tumpang tindih."
+  },
+  {
+    q: "2. Sebuah balok berukuran 8 cm × 5 cm × 3 cm. Berapa volume balok tersebut?",
+    opts: ["16 cm³", "120 cm³", "80 cm³"],
+    correct: 1,
+    fb: "Benar! V = p × l × t = 8 × 5 × 3 = 120 cm³."
+  },
+  {
+    q: "3. Jika panjang rusuk sebuah kubus diperbesar 2 kali lipat, volumenya menjadi berapa kali volume semula?",
+    opts: ["2 kali", "4 kali", "8 kali"],
+    correct: 2,
+    fb: "Benar! Karena volume berubah secara kubik: (2k)³ = 2³ × k³ = 8 kali volume semula, bukan 2 kali."
+  },
+  {
+    q: "4. Sebuah limas segiempat memiliki luas alas 36 cm² dan tinggi 9 cm. Berapa volumenya?",
+    opts: ["324 cm³", "108 cm³", "162 cm³"],
+    correct: 1,
+    fb: "Benar! V = ⅓ × L.alas × t = ⅓ × 36 × 9 = 108 cm³. Ingat faktor ⅓ pada limas, berbeda dengan prisma!"
+  }
+];
+
+let score = 0;
+const quizArea = document.getElementById('quizArea');
+const scorePill = document.getElementById('scorePill');
+
+quizData.forEach((item, qi)=>{
+  const card = document.createElement('div');
+  card.className = 'quiz-card';
+  card.innerHTML = `<div class="qtext">${item.q}</div><div class="opts"></div><div class="fb"></div>`;
+  const optsWrap = card.querySelector('.opts');
+  const fb = card.querySelector('.fb');
+  let answered = false;
+  item.opts.forEach((optText, oi)=>{
+    const opt = document.createElement('div');
+    opt.className = 'opt';
+    opt.textContent = optText;
+    opt.addEventListener('click', ()=>{
+      if(answered) return;
+      answered = true;
+      [...optsWrap.children].forEach((c,ci)=>{
+        if(ci===item.correct) c.classList.add('correct');
+        else if(ci===oi) c.classList.add('wrong');
+      });
+      if(oi===item.correct){ score++; scorePill.textContent = `Skor: ${score} / ${quizData.length}`; }
+      fb.textContent = item.fb;
+      fb.classList.add('show');
+    });
+    optsWrap.appendChild(opt);
+  });
+  quizArea.appendChild(card);
+});
+</script>
+</body>
+</html>
